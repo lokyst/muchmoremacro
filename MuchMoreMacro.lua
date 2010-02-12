@@ -83,7 +83,10 @@ local defaults = {
     },
 }
 
-local function createButton(index)
+
+
+-- Button functions
+local function getButton(index)
 	local button
 
 	if (_G["MMMacroButton"..index]) then
@@ -95,6 +98,19 @@ local function createButton(index)
     return button
 end
 
+local function deleteButton(index)
+    local button = getButton(index)
+    if button then
+        ClearOverrideBindings(button)
+        _G["MMMacroButton" .. index] = nil
+        return true
+    end
+    return false
+end
+
+
+
+-- Initialization and event handling
 function MMMacro:OnInitialize()
   -- Code that you want to run when the addon is first loaded goes here.
     self.db = LibStub("AceDB-3.0"):New("MMMacroDB", defaults)
@@ -134,13 +150,7 @@ end
 
 function MMMacro:OnEnable()
     -- Called when the addon is enabled
-
-    for name, macro in pairs(self.db.profile.macroTable) do
-        if macro.binding == "" then
-        else
-            self:BindMacro(name, macro.binding)
-        end
-    end
+    self:RefreshBindings()
 end
 
 function MMMacro:OnDisable()
@@ -158,7 +168,7 @@ end
 function MMMacro:OnPlayerLeaveCombat()
     self.inCombat = false
     if self.delayedMacroUpdate == true then
-        self:UpdateAll()
+        -- self:UpdateAll()
         self.delayedMacroUpdate = false
     end
 end
@@ -189,23 +199,6 @@ function MMMacro:SetNewMacro(info, name)
     self:UpdateDisplayedMacro()
 end
 
-function MMMacro:UpdateDisplayedMacro()
-    local name = self.selectedMacroName
-    self.selectedMacro = self:GetMacroListKeyByName(name)
-    if self.selectedMacro then
-        self.selectedMacroBody = self.db.profile.macroTable[name].body
-        options.args.general.args.macroName.disabled = false
-        options.args.general.args.macroEditBox.disabled = false
-        options.args.general.args.macroBinding.disabled = false
-    else
-        self.selectedMacroName = nil
-        self.selectedMacroBody = nil
-        options.args.general.args.macroName.disabled = true
-        options.args.general.args.macroEditBox.disabled = true
-        options.args.general.args.macroBinding.disabled = true
-    end
-end
-
 function MMMacro:GetSelectMacro(info)
     return self.selectedMacro
 end
@@ -226,10 +219,15 @@ function MMMacro:SetMacroName(info, name)
 
     -- Grabs the macro text stored under the old name and stores it under the new name
     local body = self.db.profile.macroTable[self.selectedMacroName].body
+    local binding = self.db.profile.macroTable[self.selectedMacroName].binding
+    self.db.profile.macroTable[name] = {}
     self.db.profile.macroTable[name].body = body
+    self.db.profile.macroTable[name].binding = binding
 
     -- Erases the old name and sets the new name as the selection
+    deleteButton(self.selectedMacroName)
     self.db.profile.macroTable[self.selectedMacroName] = nil
+
     self.selectedMacroName = name
     self:UpdateMacroList()
     self:UpdateDisplayedMacro()
@@ -245,30 +243,6 @@ function MMMacro:SetMacroBody(info, body)
     self.db.profile.macroTable[self.selectedMacroName].body = body
     self.selectedMacroBody = body
     self:UpdateDisplayedMacro()
-end
-
-function MMMacro:UpdateMacroList()
-    local macroList = {}
-    for name, _ in pairs(self.db.profile.macroTable) do
-        table.insert(macroList, name)
-    end
-
-    table.sort(macroList)
-    options.args.general.args.macroSelectBox.values = macroList
-    options.args.general.args.macroDeleteBox.values = macroList
-end
-
-function MMMacro:GetMacroListKeyByName(name)
-    local index = nil
-
-    for i, macroName in ipairs(options.args.general.args.macroSelectBox.values) do
-        if macroName == name then
-            index = i
-            break
-        end
-    end
-
-    return index
 end
 
 function MMMacro:GetMacroBinding(info)
@@ -290,9 +264,6 @@ function MMMacro:SetMacroBinding(info, key)
     self:BindMacro(name, self.db.profile.macroTable[name].binding)
 end
 
-
-
--- Macro Processing
 function MMMacro:GetMacroDelete(info)
     return nil
 end
@@ -301,25 +272,82 @@ function MMMacro:SetMacroDelete(info, key)
     local name = options.args.general.args.macroDeleteBox.values[key]
     self.db.profile.macroTable[name] = nil
 
+    deleteButton(name)
+
     self:UpdateMacroList()
     self:UpdateDisplayedMacro()
-
-    -- Do not add deletion of the blizzard macro!
-    -- The action bar is tied to the macroID which changes when the macro is re-created
 end
 
+
+
+-- Macro Processing
 function MMMacro:BindMacro(name, binding)
     local macro = self.db.profile.macroTable[name]
-    local button = createButton(name)
+    local button = getButton(name)
 
     if binding == "" then
         ClearOverrideBindings(button)
     else
         button:SetAttribute("type","macro")
         button:SetAttribute("*macrotext*", self.db.profile.macroTable[name].body)
+        ClearOverrideBindings(button)
         SetOverrideBindingClick(button, false, binding, button:GetName())
     end
 end
+
+function MMMacro:RefreshBindings()
+    for name, macro in pairs(self.db.profile.macroTable) do
+        if macro.binding == "" then
+        else
+            self:BindMacro(name, macro.binding)
+        end
+    end
+end
+
+function MMMacro:GetMacroListKeyByName(name)
+    local index = nil
+
+    for i, macroName in ipairs(options.args.general.args.macroSelectBox.values) do
+        if macroName == name then
+            index = i
+            break
+        end
+    end
+
+    return index
+end
+
+function MMMacro:UpdateMacroList()
+    local macroList = {}
+    for name, _ in pairs(self.db.profile.macroTable) do
+        table.insert(macroList, name)
+    end
+
+    table.sort(macroList)
+    options.args.general.args.macroSelectBox.values = macroList
+    options.args.general.args.macroDeleteBox.values = macroList
+end
+
+function MMMacro:UpdateDisplayedMacro()
+    local name = self.selectedMacroName
+    self.selectedMacro = self:GetMacroListKeyByName(name)
+    if self.selectedMacro then
+        self.selectedMacroBody = self.db.profile.macroTable[name].body
+        options.args.general.args.macroName.disabled = false
+        options.args.general.args.macroEditBox.disabled = false
+        options.args.general.args.macroBinding.disabled = false
+    else
+        self.selectedMacroName = nil
+        self.selectedMacroBody = nil
+        options.args.general.args.macroName.disabled = true
+        options.args.general.args.macroEditBox.disabled = true
+        options.args.general.args.macroBinding.disabled = true
+    end
+    self:RefreshBindings()
+end
+
+
+
 
 -- Profile Handling
 function MMMacro:InitializePresets(db, profile)
