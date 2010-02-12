@@ -81,7 +81,7 @@ local defaults = {
     },
 }
 
-
+local macroList = {}
 
 -- Button functions
 local function getButton(index)
@@ -329,7 +329,7 @@ function MMMacro:GetMacroListKeyByName(name)
 end
 
 function MMMacro:UpdateMacroList()
-    local macroList = {}
+    wipe(macroList)
     for name, _ in pairs(self.db.profile.macroTable) do
         table.insert(macroList, name)
     end
@@ -365,6 +365,13 @@ function MMMacro:InitializePresets(db, profile)
 end
 
 function MMMacro:RefreshConfig()
+    self:ClearMacros()
     self:UpdateMacroList()
     self:UpdateDisplayedMacro()
+end
+
+function MMMacro:ClearMacros()
+    for _, name in ipairs(macroList) do
+        deleteButton(name)
+    end
 end
