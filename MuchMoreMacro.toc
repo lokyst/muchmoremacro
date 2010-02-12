@@ -1,0 +1,13 @@
+## Interface: 30300
+## Title: MuchMoreMacro
+## Notes: Create and bind infinite macros
+## Author: lokyst
+## Version: 0.1
+## SavedVariables: MMMacroDB
+## OptionalDeps: Blizzard_DebugTools
+
+embeds.xml
+
+Localization\enUS.lua
+
+MuchMoreMacro.lua
