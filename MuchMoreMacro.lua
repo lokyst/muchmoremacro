@@ -69,8 +69,6 @@ local options = {
                     confirmText = L['Are you sure you wish to delete the selected macro?']
                 },
 
-
-
             },
         },
 
@@ -88,7 +86,6 @@ local defaults = {
 -- Button functions
 local function getButton(index)
 	local button
-
 	if (_G["MMMacroButton"..index]) then
 		button = _G["MMMacroButton" .. index]
 	else
@@ -101,8 +98,9 @@ end
 local function deleteButton(index)
     local button = getButton(index)
     if button then
+        button:SetAttribute("type", nil)
+        button:SetAttribute("macrotext", nil)
         ClearOverrideBindings(button)
-        _G["MMMacroButton" .. index] = nil
         return true
     end
     return false
@@ -123,7 +121,6 @@ function MMMacro:OnInitialize()
     self.selectedMacroName = nil
     self.selectedMacroBody = nil
     self.delayedMacroUpdate = false
-    self.defaultMacroBody = ""
 
     -- Register events
     self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
@@ -187,13 +184,13 @@ end
 function MMMacro:SetNewMacro(info, name)
     if strtrim(name) == "" then return end
 
-    local body = self.defaultMacroBody
-    self.db.profile.macroTable[name] = {
-        body = "",
-        binding = "",
-    }
-    self.db.profile.macroTable[name].body = body
-    self:UpdateMacroList()
+    if not(self.db.profile.macroTable[name]) then
+        self.db.profile.macroTable[name] = {
+            body = "",
+            bindings = {},
+        }
+        self:UpdateMacroList()
+    end
 
     self.selectedMacroName = name
     self:UpdateDisplayedMacro()
@@ -219,10 +216,10 @@ function MMMacro:SetMacroName(info, name)
 
     -- Grabs the macro text stored under the old name and stores it under the new name
     local body = self.db.profile.macroTable[self.selectedMacroName].body
-    local binding = self.db.profile.macroTable[self.selectedMacroName].binding
+    local bindings = self.db.profile.macroTable[self.selectedMacroName].bindings
     self.db.profile.macroTable[name] = {}
     self.db.profile.macroTable[name].body = body
-    self.db.profile.macroTable[name].binding = binding
+    self.db.profile.macroTable[name].bindings = bindings
 
     -- Erases the old name and sets the new name as the selection
     deleteButton(self.selectedMacroName)
@@ -248,20 +245,31 @@ end
 function MMMacro:GetMacroBinding(info)
     if not self.selectedMacroName then return end
 
-    return self.db.profile.macroTable[self.selectedMacroName].binding
+    local string = ""
+    local bindings = self.db.profile.macroTable[self.selectedMacroName].bindings
+    if #bindings > 0 then
+        for _, key in ipairs(bindings) do
+            string = string .. " " .. key
+        end
+    end
+
+    return string
 end
 
 function MMMacro:SetMacroBinding(info, key)
     local name = self.selectedMacroName
     if name == "" then return end
 
-    if key == "ESC" then
-        self.db.profile.macroTable[name].binding = ""
+    if key == "" then
+        self.db.profile.macroTable[name].bindings = {}
     else
-        self.db.profile.macroTable[name].binding = key
+        for _, binding in ipairs(self.db.profile.macroTable[name].bindings) do
+            if key == binding then return end
+        end
+        table.insert(self.db.profile.macroTable[name].bindings, key)
     end
 
-    self:BindMacro(name, self.db.profile.macroTable[name].binding)
+    self:BindMacro(name, self.db.profile.macroTable[name].bindings)
 end
 
 function MMMacro:GetMacroDelete(info)
@@ -281,25 +289,28 @@ end
 
 
 -- Macro Processing
-function MMMacro:BindMacro(name, binding)
+function MMMacro:BindMacro(name, bindings)
     local macro = self.db.profile.macroTable[name]
     local button = getButton(name)
 
-    if binding == "" then
+    if #bindings == 0 then
         ClearOverrideBindings(button)
     else
         button:SetAttribute("type","macro")
-        button:SetAttribute("*macrotext*", self.db.profile.macroTable[name].body)
+        button:SetAttribute("macrotext", self.db.profile.macroTable[name].body)
         ClearOverrideBindings(button)
-        SetOverrideBindingClick(button, false, binding, button:GetName())
+        for _, key in ipairs(self.db.profile.macroTable[name].bindings) do
+            SetOverrideBindingClick(button, false, key, button:GetName())
+        end
     end
 end
 
 function MMMacro:RefreshBindings()
     for name, macro in pairs(self.db.profile.macroTable) do
-        if macro.binding == "" then
+        local bindings = macro.bindings
+        if #bindings == 0 then
         else
-            self:BindMacro(name, macro.binding)
+            self:BindMacro(name, bindings)
         end
     end
 end
@@ -345,7 +356,6 @@ function MMMacro:UpdateDisplayedMacro()
     end
     self:RefreshBindings()
 end
-
 
 
 
