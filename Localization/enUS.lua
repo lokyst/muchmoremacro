@@ -23,7 +23,5 @@ L["Blizzard macro update aborted: An unrecognised macro called %s already exists
         return "Blizzard macro update aborted: An unrecognised macro called "..s.." already exists. Please rename your macro."
     end
 L['Macro Binding'] = true
-L['Bind the macro to key combination'] = true
-
 
 end

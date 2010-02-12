@@ -39,8 +39,7 @@ local options = {
 
                 macroBinding = {
                     name = L['Macro Binding'],
-                    type = 'input',
-                    desc = L['Bind the macro to key combination'],
+                    type = 'keybinding',
                     set = 'SetMacroBinding',
                     get = 'GetMacroBinding',
                     order = 31,
@@ -105,8 +104,8 @@ function MMMacro:OnInitialize()
     -- initialize flags
     self.inCombat = nil
     self.selectedMacro = nil
-    self.selectedMacroName = ""
-    self.selectedMacroBody = ""
+    self.selectedMacroName = nil
+    self.selectedMacroBody = nil
     self.delayedMacroUpdate = false
     self.defaultMacroBody = ""
 
@@ -129,6 +128,7 @@ function MMMacro:OnInitialize()
     self:RegisterChatCommand("muchmoremacro", function() InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro") end)
 
     -- Populate lists
+    self:UpdateDisplayedMacro()
     self:UpdateMacroList()
 end
 
@@ -190,17 +190,19 @@ function MMMacro:SetNewMacro(info, name)
 end
 
 function MMMacro:UpdateDisplayedMacro()
-    name = self.selectedMacroName
+    local name = self.selectedMacroName
     self.selectedMacro = self:GetMacroListKeyByName(name)
     if self.selectedMacro then
         self.selectedMacroBody = self.db.profile.macroTable[name].body
         options.args.general.args.macroName.disabled = false
         options.args.general.args.macroEditBox.disabled = false
+        options.args.general.args.macroBinding.disabled = false
     else
         self.selectedMacroName = nil
         self.selectedMacroBody = nil
         options.args.general.args.macroName.disabled = true
         options.args.general.args.macroEditBox.disabled = true
+        options.args.general.args.macroBinding.disabled = true
     end
 end
 
@@ -238,6 +240,8 @@ function MMMacro:GetMacroBody(info)
 end
 
 function MMMacro:SetMacroBody(info, body)
+    if not self.selectedMacroName then return end
+
     self.db.profile.macroTable[self.selectedMacroName].body = body
     self.selectedMacroBody = body
     self:UpdateDisplayedMacro()
@@ -268,17 +272,22 @@ function MMMacro:GetMacroListKeyByName(name)
 end
 
 function MMMacro:GetMacroBinding(info)
-    if self.selectedMacroName == "" then return "" end
+    if not self.selectedMacroName then return end
 
     return self.db.profile.macroTable[self.selectedMacroName].binding
 end
 
-function MMMacro:SetMacroBinding(info, macroBinding)
+function MMMacro:SetMacroBinding(info, key)
     local name = self.selectedMacroName
     if name == "" then return end
-    self.db.profile.macroTable[name].binding = macroBinding
 
-    self:BindMacro(name, macroBinding)
+    if key == "ESC" then
+        self.db.profile.macroTable[name].binding = ""
+    else
+        self.db.profile.macroTable[name].binding = key
+    end
+
+    self:BindMacro(name, self.db.profile.macroTable[name].binding)
 end
 
 
