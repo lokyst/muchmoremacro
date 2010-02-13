@@ -307,11 +307,7 @@ end
 
 function MMMacro:RefreshBindings()
     for name, macro in pairs(self.db.profile.macroTable) do
-        local bindings = macro.bindings
-        if #bindings == 0 then
-        else
-            self:BindMacro(name, bindings)
-        end
+        self:BindMacro(name, macro.bindings)
     end
 end
 
