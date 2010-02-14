@@ -152,6 +152,7 @@ end
 
 function MMMacro:OnDisable()
     -- Called when the addon is disabled
+    self:ClearMacros()
 end
 
 function MMMacro:OnPlayerLogin()
