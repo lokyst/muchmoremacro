@@ -2,9 +2,9 @@
 ## Title: MuchMoreMacro
 ## Notes: Create and bind infinite macros
 ## Author: lokyst
-## Version: 0.1
+## Version: 1.0
 ## SavedVariables: MMMacroDB
-## OptionalDeps: Blizzard_DebugTools
+## OptionalDeps: 
 
 embeds.xml
 
