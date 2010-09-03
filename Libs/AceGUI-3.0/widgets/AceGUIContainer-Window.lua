@@ -4,6 +4,7 @@ local AceGUI = LibStub("AceGUI-3.0")
 local pairs, assert, type = pairs, assert, type
 
 -- WoW APIs
+local PlaySound = PlaySound
 local CreateFrame, UIParent = CreateFrame, UIParent
 
 -- Global vars/functions that we don't upvalue since they might get hooked, or upgraded
@@ -20,13 +21,14 @@ local CreateFrame, UIParent = CreateFrame, UIParent
 ]]
 do
 	local Type = "Window"
-	local Version = 2
+	local Version = 4
 
 	local function frameOnClose(this)
 		this.obj:Fire("OnClose")
 	end
 	
 	local function closeOnClick(this)
+		PlaySound("gsTitleOptionExit")
 		this.obj:Hide()
 	end
 	
@@ -90,6 +92,7 @@ do
 		self.frame:SetFrameStrata("FULLSCREEN_DIALOG")
 		self:ApplyStatus()
 		self:EnableResize(true)
+		self:Show()
 	end
 	
 	local function OnRelease(self)
