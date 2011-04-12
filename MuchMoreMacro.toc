@@ -11,4 +11,3 @@ embeds.xml
 Localization\enUS.lua
 
 MuchMoreMacro.lua
-MuchMoreMultiLineEditBox.lua

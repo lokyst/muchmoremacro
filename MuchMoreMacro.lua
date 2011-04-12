@@ -53,8 +53,7 @@ local options = {
                     get = 'GetMacroBody',
                     multiline = true,
                     width = 'full',
-                    order = 32,
-                    dialogControl = "MuchMoreMultiLineEditBox",
+                    order = 32
                 },
 
                 macroDeleteBox = {
