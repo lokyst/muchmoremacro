@@ -1,4 +1,4 @@
-## Interface: 40000
+## Interface: 40200
 ## Title: MuchMoreMacro
 ## Notes: Create and bind infinite macros
 ## Author: lokyst
