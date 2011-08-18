@@ -115,6 +115,11 @@ function MMMacro:OnInitialize()
     options.args.profile = LibStub("AceDBOptions-3.0"):GetOptionsTable(self.db)
     LibStub("AceConfig-3.0"):RegisterOptionsTable("MMMacro", options, nil)
 
+    -- Add dual-spec support
+    local LibDualSpec = LibStub('LibDualSpec-1.0')
+    LibDualSpec:EnhanceDatabase(self.db, "MMMacroDB")
+    LibDualSpec:EnhanceOptions(options.args.profile, self.db)
+
     -- initialize flags
     self.inCombat = nil
     self.selectedMacro = nil
