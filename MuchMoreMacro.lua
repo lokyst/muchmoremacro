@@ -178,8 +178,8 @@ function MMMacro:OnInitialize()
     ACD:AddToBlizOptions("MMMacro", L["General"], "MuchMoreMacro", "generalOptions")
     ACD:AddToBlizOptions("MMMacro", L["Profile"], "MuchMoreMacro", "profile")
 
-    self:RegisterChatCommand("mmmacro", function() InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro") end)
-    self:RegisterChatCommand("muchmoremacro", function() InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro") end)
+    self:RegisterChatCommand("mmmacro", "ChatCommand")
+    self:RegisterChatCommand("muchmoremacro", "ChatCommand")
 
     -- Populate lists
     self:UpdateDisplayedMacro()
@@ -412,7 +412,14 @@ function MMMacro:UpdateDisplayedMacro()
     self:RefreshBindings()
 end
 
-
+-- Chat command handling
+function MMMacro:ChatCommand(input)
+    if not input or input:trim() == "" then
+	InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
+    else
+	LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", input)
+    end
+end
 
 -- Profile Handling
 function MMMacro:InitializePresets(db, profile)
