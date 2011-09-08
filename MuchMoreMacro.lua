@@ -22,7 +22,7 @@ local options = {
     type = 'group',
     args = {
         main = {
-            name = L['Edit Macro'],
+            name = L['Edit Macros'],
             type = 'group',
             args = {
                 newMacro = {
@@ -87,8 +87,8 @@ local options = {
             },
         },
 
-        generalOptions = {
-            name = L['General'],
+        general = {
+            name = L['General Options'],
             type = 'group',
             args = {
 		showMinimapIcon = {
@@ -175,7 +175,7 @@ function MMMacro:OnInitialize()
     -- Create Interface Config Options
     local ACD = LibStub("AceConfigDialog-3.0")
     ACD:AddToBlizOptions("MMMacro", "MuchMoreMacro", nil, "main")
-    ACD:AddToBlizOptions("MMMacro", L["General"], "MuchMoreMacro", "generalOptions")
+    ACD:AddToBlizOptions("MMMacro", L["General Options"], "MuchMoreMacro", "general")
     ACD:AddToBlizOptions("MMMacro", L["Profile"], "MuchMoreMacro", "profile")
 
     self:RegisterChatCommand("mmmacro", "ChatCommand")
@@ -416,6 +416,8 @@ end
 function MMMacro:ChatCommand(input)
     if not input or input:trim() == "" then
 	InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
+    elseif input:trim() == "help" then
+	LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", "")
     else
 	LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", input)
     end
