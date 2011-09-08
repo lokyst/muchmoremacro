@@ -1,13 +1,28 @@
 MMMacro = LibStub("AceAddon-3.0"):NewAddon("MMMacro", "AceConsole-3.0", "AceEvent-3.0")
 local L = LibStub("AceLocale-3.0"):GetLocale("MMMacro", true)
 
+-- Set up DataBroker object
+local MuchMoreMacroLDB = LibStub("LibDataBroker-1.1"):NewDataObject("MuchMoreMacro", {
+    type = "data source",
+    text = "",
+    label = "MuchMoreMacro",
+    icon = "Interface\\MacroFrame\\MacroFrame-Icon",
+    OnClick = function(frame, button)
+        if button == "RightButton" then
+            InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
+        end
+    end,
+})
+local mmmacroDBIcon = LibStub("LibDBIcon-1.0")
+
+
 local options = {
     name = "MuchMoreMacro",
     handler = MMMacro,
     type = 'group',
     args = {
-        general = {
-            name = L['General'],
+        main = {
+            name = L['Edit Macro'],
             type = 'group',
             args = {
                 newMacro = {
@@ -72,12 +87,32 @@ local options = {
             },
         },
 
+        generalOptions = {
+            name = L['General'],
+            type = 'group',
+            args = {
+		showMinimapIcon = {
+		    name = L['Show Minimap Icon'],
+                    type = 'toggle',
+                    desc = L['Show or hide minimap icon'],
+		    width = 'full',
+                    set = 'SetMinimapIconShow',
+                    get = 'GetMinimapIconShow',
+                    order = 100,
+		},
+
+            },
+        },
+
     },
 }
 
 local defaults = {
     profile = {
         macroTable = {},
+	minimap = {
+	    hide = false,
+	},
     },
 }
 
@@ -139,7 +174,8 @@ function MMMacro:OnInitialize()
 
     -- Create Interface Config Options
     local ACD = LibStub("AceConfigDialog-3.0")
-    ACD:AddToBlizOptions("MMMacro", "MuchMoreMacro", nil, "general")
+    ACD:AddToBlizOptions("MMMacro", "MuchMoreMacro", nil, "main")
+    ACD:AddToBlizOptions("MMMacro", L["General"], "MuchMoreMacro", "generalOptions")
     ACD:AddToBlizOptions("MMMacro", L["Profile"], "MuchMoreMacro", "profile")
 
     self:RegisterChatCommand("mmmacro", function() InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro") end)
@@ -148,6 +184,10 @@ function MMMacro:OnInitialize()
     -- Populate lists
     self:UpdateDisplayedMacro()
     self:UpdateMacroList()
+
+    -- Register the minimap icon
+    mmmacroDBIcon:Register("MuchMoreMacro", MuchMoreMacroLDB, self.db.profile.minimap)
+
 end
 
 function MMMacro:OnEnable()
@@ -208,7 +248,7 @@ end
 
 function MMMacro:SetSelectMacro(info, key)
     -- Update contents of macro edit box
-    local name = options.args.general.args.macroSelectBox.values[key]
+    local name = options.args.main.args.macroSelectBox.values[key]
     self.selectedMacroName = name
     self:UpdateDisplayedMacro()
 end
@@ -283,7 +323,7 @@ function MMMacro:GetMacroDelete(info)
 end
 
 function MMMacro:SetMacroDelete(info, key)
-    local name = options.args.general.args.macroDeleteBox.values[key]
+    local name = options.args.main.args.macroDeleteBox.values[key]
     self.db.profile.macroTable[name] = nil
 
     deleteButton(name)
@@ -292,6 +332,19 @@ function MMMacro:SetMacroDelete(info, key)
     self:UpdateDisplayedMacro()
 end
 
+
+function MMMacro:GetMinimapIconShow(info)
+    return not self.db.profile.minimap.hide
+end
+
+function MMMacro:SetMinimapIconShow(info, value)
+    self.db.profile.minimap.hide = not value
+    if self.db.profile.minimap.hide then
+	    mmmacroDBIcon:Hide("MuchMoreMacro")
+    else
+	    mmmacroDBIcon:Show("MuchMoreMacro")
+    end
+end
 
 
 -- Macro Processing
@@ -320,7 +373,7 @@ end
 function MMMacro:GetMacroListKeyByName(name)
     local index = nil
 
-    for i, macroName in ipairs(options.args.general.args.macroSelectBox.values) do
+    for i, macroName in ipairs(options.args.main.args.macroSelectBox.values) do
         if macroName == name then
             index = i
             break
@@ -337,8 +390,8 @@ function MMMacro:UpdateMacroList()
     end
 
     table.sort(macroList)
-    options.args.general.args.macroSelectBox.values = macroList
-    options.args.general.args.macroDeleteBox.values = macroList
+    options.args.main.args.macroSelectBox.values = macroList
+    options.args.main.args.macroDeleteBox.values = macroList
 end
 
 function MMMacro:UpdateDisplayedMacro()
@@ -346,15 +399,15 @@ function MMMacro:UpdateDisplayedMacro()
     self.selectedMacro = self:GetMacroListKeyByName(name)
     if self.selectedMacro then
         self.selectedMacroBody = self.db.profile.macroTable[name].body
-        options.args.general.args.macroName.disabled = false
-        options.args.general.args.macroEditBox.disabled = false
-        options.args.general.args.macroBinding.disabled = false
+        options.args.main.args.macroName.disabled = false
+        options.args.main.args.macroEditBox.disabled = false
+        options.args.main.args.macroBinding.disabled = false
     else
         self.selectedMacroName = nil
         self.selectedMacroBody = nil
-        options.args.general.args.macroName.disabled = true
-        options.args.general.args.macroEditBox.disabled = true
-        options.args.general.args.macroBinding.disabled = true
+        options.args.main.args.macroName.disabled = true
+        options.args.main.args.macroEditBox.disabled = true
+        options.args.main.args.macroBinding.disabled = true
     end
     self:RefreshBindings()
 end

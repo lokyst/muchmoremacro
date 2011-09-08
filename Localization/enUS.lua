@@ -15,5 +15,8 @@ L['Select a macro to be deleted'] = true
 L['Are you sure you wish to delete the selected macro?'] = true
 L["Profile"] = true
 L['Macro Binding'] = true
+L['Show Minimap Icon'] =  true
+L['Show or hide minimap icon'] = true
+L['Edit Macro'] = true
 
 end
