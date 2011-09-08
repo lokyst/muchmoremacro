@@ -421,6 +421,16 @@ function MMMacro:ChatCommand(input)
     end
 end
 
+-- Refresh UI
+function MMMacro:RefreshUI()
+    if self.db.profile.minimap.hide then
+	    mmmacroDBIcon:Hide("MuchMoreMacro")
+    else
+	    mmmacroDBIcon:Show("MuchMoreMacro")
+    end
+end
+
+
 -- Profile Handling
 function MMMacro:InitializePresets(db, profile)
     self:RefreshConfig()
@@ -430,6 +440,7 @@ function MMMacro:RefreshConfig()
     self:ClearMacros()
     self:UpdateMacroList()
     self:UpdateDisplayedMacro()
+    self:RefreshUI()
 end
 
 function MMMacro:ClearMacros()
