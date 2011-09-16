@@ -162,6 +162,9 @@ function MMMacro:OnInitialize()
     self.selectedMacroBody = nil
     self.delayedMacroUpdate = false
 
+    -- Register the minimap icon before we call RefreshConfig which uses the icon
+    mmmacroDBIcon:Register("MuchMoreMacro", MuchMoreMacroLDB, self.db.profile.minimap)
+
     -- Register events
     self:RegisterEvent("PLAYER_LOGIN", "OnPlayerLogin")
     self:RegisterEvent("PLAYER_REGEN_DISABLED", "OnPlayerEnterCombat")
@@ -184,9 +187,6 @@ function MMMacro:OnInitialize()
     -- Populate lists
     self:UpdateDisplayedMacro()
     self:UpdateMacroList()
-
-    -- Register the minimap icon
-    mmmacroDBIcon:Register("MuchMoreMacro", MuchMoreMacroLDB, self.db.profile.minimap)
 
 end
 
