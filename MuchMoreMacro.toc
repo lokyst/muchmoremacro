@@ -2,7 +2,7 @@
 ## Title: MuchMoreMacro
 ## Notes: Create and bind infinite macros
 ## Author: lokyst
-## Version: 1.2.0
+## Version: 1.2.1
 ## SavedVariables: MMMacroDB
 ## OptionalDeps:
 
