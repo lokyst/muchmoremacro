@@ -18,5 +18,7 @@ L['Macro Binding'] = true
 L['Show Minimap Icon'] =  true
 L['Show or hide minimap icon'] = true
 L['Edit Macros'] = true
+L['Key Down'] = true
+L['Execute macro when key is pressed down. Default behavior is to execute on key release.'] = true
 
 end

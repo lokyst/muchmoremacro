@@ -60,6 +60,16 @@ local options = {
                     order = 31,
                 },
 
+                macroKeyDown = {
+                    name = L['Key Down'],
+                    desc = L['Execute macro when key is pressed down. Default behavior is to execute on key release.'],
+                    type = 'toggle',
+                    tristate = true,
+                    set = 'SetMacroKeyDown',
+                    get = 'GetMacroKeyDown',
+                    order = 32,
+                },
+
                 macroEditBox = {
                     name = L['Macro Text'],
                     type = 'input',
@@ -68,7 +78,7 @@ local options = {
                     get = 'GetMacroBody',
                     multiline = true,
                     width = 'full',
-                    order = 32
+                    order = 35
                 },
 
                 macroDeleteBox = {
@@ -234,6 +244,7 @@ function MMMacro:SetNewMacro(info, name)
         self.db.profile.macroTable[name] = {
             body = "",
             bindings = {},
+            keyDown = false,
         }
         self:UpdateMacroList()
     end
@@ -346,6 +357,39 @@ function MMMacro:SetMinimapIconShow(info, value)
     end
 end
 
+function MMMacro:GetMacroKeyDown(info)
+    if not self.selectedMacroName then return false end
+
+    local value = self.db.profile.macroTable[self.selectedMacroName].keyDown
+
+    -- Check for existence of keydown parameter
+    if value == nil then
+        value = false
+
+    -- Check for third check box state and return a true nil
+    elseif value == "both" then
+        value = nil
+
+    -- else return the value as is
+    end
+
+    return value
+
+end
+
+function MMMacro:SetMacroKeyDown(info, value)
+    local name = self.selectedMacroName
+    if name == "" or name == nil then return end
+
+    if value == nil then
+        value = "both"
+    end
+
+    self.db.profile.macroTable[name].keyDown = value
+    self:RegisterForKeyPress(name)
+
+end
+
 
 -- Macro Processing
 function MMMacro:BindMacro(name, bindings)
@@ -362,6 +406,31 @@ function MMMacro:BindMacro(name, bindings)
             SetOverrideBindingClick(button, false, key, button:GetName())
         end
     end
+end
+
+function MMMacro:RegisterForKeyPress(name)
+    local macro = self.db.profile.macroTable[name]
+    local button = getButton(name)
+
+    local keyDown = self.db.profile.macroTable[name].keyDown
+    local up = ""
+    local down = ""
+
+    -- Tristate
+    if keyDown == "both" then
+        up = "AnyUp"
+        down = "AnyDown"
+
+    -- Key down
+    elseif keyDown == true then
+        down = "AnyDown"
+
+    -- Default to key up
+    else
+        up = "AnyUp"
+    end
+
+    button:RegisterForClicks(up, down)
 end
 
 function MMMacro:RefreshBindings()
