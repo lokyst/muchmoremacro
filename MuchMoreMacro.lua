@@ -101,15 +101,15 @@ local options = {
             name = L['General Options'],
             type = 'group',
             args = {
-		showMinimapIcon = {
-		    name = L['Show Minimap Icon'],
+                showMinimapIcon = {
+                    name = L['Show Minimap Icon'],
                     type = 'toggle',
                     desc = L['Show or hide minimap icon'],
-		    width = 'full',
+                    width = 'full',
                     set = 'SetMinimapIconShow',
                     get = 'GetMinimapIconShow',
                     order = 100,
-		},
+                },
 
             },
         },
@@ -120,9 +120,9 @@ local options = {
 local defaults = {
     profile = {
         macroTable = {},
-	minimap = {
-	    hide = false,
-	},
+        minimap = {
+            hide = false,
+        },
     },
 }
 
@@ -130,12 +130,12 @@ local macroList = {}
 
 -- Button functions
 local function getButton(index)
-	local button
-	if (_G["MMMacroButton"..index]) then
-		button = _G["MMMacroButton" .. index]
-	else
-		button = CreateFrame("CheckButton", "MMMacroButton" .. index, UIParent, "SecureActionButtonTemplate")
-	end
+        local button
+        if (_G["MMMacroButton"..index]) then
+            button = _G["MMMacroButton" .. index]
+        else
+            button = CreateFrame("CheckButton", "MMMacroButton" .. index, UIParent, "SecureActionButtonTemplate")
+        end
 
     return button
 end
@@ -351,9 +351,9 @@ end
 function MMMacro:SetMinimapIconShow(info, value)
     self.db.profile.minimap.hide = not value
     if self.db.profile.minimap.hide then
-	    mmmacroDBIcon:Hide("MuchMoreMacro")
+        mmmacroDBIcon:Hide("MuchMoreMacro")
     else
-	    mmmacroDBIcon:Show("MuchMoreMacro")
+        mmmacroDBIcon:Show("MuchMoreMacro")
     end
 end
 
@@ -484,20 +484,20 @@ end
 -- Chat command handling
 function MMMacro:ChatCommand(input)
     if not input or input:trim() == "" then
-	InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
+        InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
     elseif input:trim() == "help" then
-	LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", "")
+        LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", "")
     else
-	LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", input)
+        LibStub("AceConfigCmd-3.0").HandleCommand(MuchMoreMacro, "mmmacro", "MMMacro", input)
     end
 end
 
 -- Refresh UI
 function MMMacro:RefreshUI()
     if self.db.profile.minimap.hide then
-	    mmmacroDBIcon:Hide("MuchMoreMacro")
+        mmmacroDBIcon:Hide("MuchMoreMacro")
     else
-	    mmmacroDBIcon:Show("MuchMoreMacro")
+        mmmacroDBIcon:Show("MuchMoreMacro")
     end
 end
 
