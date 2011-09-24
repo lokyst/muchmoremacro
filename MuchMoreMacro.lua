@@ -12,6 +12,11 @@ local MuchMoreMacroLDB = LibStub("LibDataBroker-1.1"):NewDataObject("MuchMoreMac
             InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
         end
     end,
+    OnTooltipShow = function(tt)
+        tt:AddLine(L['MuchMoreMacro'])
+        tt:AddLine(' ')
+        tt:AddLine(L['|cffeda55fClick|r to open configuration menu'], 0.2, 1, 0.2, 1)
+    end,
 })
 local mmmacroDBIcon = LibStub("LibDBIcon-1.0")
 

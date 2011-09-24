@@ -20,5 +20,7 @@ L['Show or hide minimap icon'] = true
 L['Edit Macros'] = true
 L['Key Down'] = true
 L['Execute macro when key is pressed down. Default behavior is to execute on key release.'] = true
+L['MuchMoreMacro'] = true
+L['|cffeda55fClick|r to open configuration menu'] = true
 
 end
