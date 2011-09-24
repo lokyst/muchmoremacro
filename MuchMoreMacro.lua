@@ -8,7 +8,7 @@ local MuchMoreMacroLDB = LibStub("LibDataBroker-1.1"):NewDataObject("MuchMoreMac
     label = "MuchMoreMacro",
     icon = "Interface\\MacroFrame\\MacroFrame-Icon",
     OnClick = function(frame, button)
-        if button == "RightButton" then
+        if button == "RightButton" or button == "LeftButton" then
             InterfaceOptionsFrame_OpenToCategory("MuchMoreMacro")
         end
     end,
