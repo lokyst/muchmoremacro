@@ -1,8 +1,8 @@
-## Interface: 40300
+## Interface: 50001
 ## Title: MuchMoreMacro
 ## Notes: Create and bind infinite macros
 ## Author: lokyst
-## Version: 1.3.0
+## Version: 1.3.1
 ## SavedVariables: MMMacroDB
 ## OptionalDeps:
 
